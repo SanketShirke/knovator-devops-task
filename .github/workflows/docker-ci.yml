@@ -1,58 +1,54 @@
-name: CI/CD - Build & Push Docker Image
+name: CI/CD - Build and Push Docker Images
 
 on:
   push:
     branches:
-      - main   # Runs pipeline only on main branch
+      - main   # run only on pushes to main
 
 jobs:
-  docker-build-push:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1 - Checkout code
+      # Checkout code
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Step 2 - Login to DockerHub
+      # Login to DockerHub
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Step 3 - Set up Docker Buildx
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
-
-      # Step 4 - Build & Push Node API
-      - name: Build & Push Node API
+      # Build & Push Node API
+      - name: Build and Push Node API Image
         uses: docker/build-push-action@v4
         with:
-          context: ./node
-          file: ./node/Dockerfile
+          context: ./knovator-devops-task/node
+          file: ./knovator-devops-task/node/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-api:latest
             ${{ secrets.DOCKER_USERNAME }}/knovator-api:${{ github.sha }}
 
-      # Step 5 - Build & Push React App
-      - name: Build & Push React App
+      # Build & Push React Frontend
+      - name: Build and Push React Frontend Image
         uses: docker/build-push-action@v4
         with:
-          context: ./react
-          file: ./react/Dockerfile
+          context: ./knovator-devops-task/react
+          file: ./knovator-devops-task/react/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-react:latest
             ${{ secrets.DOCKER_USERNAME }}/knovator-react:${{ github.sha }}
 
-      # Step 6 - Build & Push Nginx
-      - name: Build & Push Nginx
+      # Build & Push Nginx
+      - name: Build and Push Nginx Image
         uses: docker/build-push-action@v4
         with:
-          context: ./nginx
-          file: ./nginx/Dockerfile
+          context: ./knovator-devops-task/nginx
+          file: ./knovator-devops-task/nginx/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-nginx:latest
