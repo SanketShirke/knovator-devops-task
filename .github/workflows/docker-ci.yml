@@ -25,8 +25,8 @@ jobs:
       - name: Build and Push Node API Image
         uses: docker/build-push-action@v4
         with:
-          context: ./node
-          file: ./node/Dockerfile
+          context: ./knovator-devops-task/node
+          file: ./knovator-devops-task/node/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-api:latest
@@ -36,8 +36,8 @@ jobs:
       - name: Build and Push React Frontend Image
         uses: docker/build-push-action@v4
         with:
-          context: ./react
-          file: ./react/Dockerfile
+          context: ./knovator-devops-task/react
+          file: ./knovator-devops-task/react/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-frontend:latest
@@ -47,8 +47,8 @@ jobs:
       - name: Build and Push Nginx Image
         uses: docker/build-push-action@v4
         with:
-          context: ./nginx
-          file: ./nginx/Dockerfile
+          context: ./knovator-devops-task/nginx
+          file: ./knovator-devops-task/nginx/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-nginx:latest
