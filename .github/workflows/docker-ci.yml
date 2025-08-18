@@ -1,55 +1,61 @@
-name: CI/CD - Build and Push Docker Images
+name: CI/CD - Build, Push & Deploy Docker Images
 
 on:
   push:
     branches:
-      - main   # run only on pushes to main
+      - main
 
 jobs:
-  build-and-push:
+  build-push-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      # Checkout code
+      # 1. Checkout code
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Login to DockerHub
+      # 2. Login to DockerHub
       - name: Login to DockerHub
         uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      # Build & Push Node API
-      - name: Build and Push Node API Image
+      # 3. Build & Push Node API
+      - name: Build & Push Node API
         uses: docker/build-push-action@v4
         with:
-          context: ./knovator-devops-task/node
-          file: ./knovator-devops-task/node/Dockerfile
+          context: ./node
+          file: ./node/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-api:latest
             ${{ secrets.DOCKER_USERNAME }}/knovator-api:${{ github.sha }}
 
-      # Build & Push React Frontend
-      - name: Build and Push React Frontend Image
+      # 4. Build & Push React Frontend
+      - name: Build & Push React Frontend
         uses: docker/build-push-action@v4
         with:
-          context: ./knovator-devops-task/react
-          file: ./knovator-devops-task/react/Dockerfile
+          context: ./react
+          file: ./react/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-react:latest
             ${{ secrets.DOCKER_USERNAME }}/knovator-react:${{ github.sha }}
 
-      # Build & Push Nginx
-      - name: Build and Push Nginx Image
+      # 5. Build & Push Nginx
+      - name: Build & Push Nginx
         uses: docker/build-push-action@v4
         with:
-          context: ./knovator-devops-task/nginx
-          file: ./knovator-devops-task/nginx/Dockerfile
+          context: ./nginx
+          file: ./nginx/Dockerfile
           push: true
           tags: |
             ${{ secrets.DOCKER_USERNAME }}/knovator-nginx:latest
             ${{ secrets.DOCKER_USERNAME }}/knovator-nginx:${{ github.sha }}
+
+      # 6. Deploy containers on the same runner
+      - name: Deploy containers
+        run: |
+          docker compose down
+          docker compose up -d
